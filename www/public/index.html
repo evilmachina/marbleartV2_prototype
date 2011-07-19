@@ -1,0 +1,34 @@
+<html>
+<head>
+	<link rel="stylesheet" href="css/style.css" type="text/css"/>
+	<script type="text/javascript" src="/socket.io/socket.io.js"> </script>
+	 <script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
+		<script type="text/javascript" src="js/slider.js"></script>
+	<script>
+	function start(){
+		var socket = io.connect();
+		socket.on("message", function(msg){
+		   	console.log(msg);		
+		});
+		socket.emit("move","asdasds");
+			$(document).ready(function(){
+				$('#rotatescroll').tinycircleslider({ callback: function(degrees){
+					    socket.emit("move","scroll");
+						console.log(degrees);} });
+			});
+	}
+	</script>
+
+</head>
+<body onload = 'start()'>
+	<div id="rotatescroll">
+	<div class="viewport">
+			<ul class="overview">
+
+			</ul>
+		</div>
+		<div class="overlay"></div>
+		<div class="thumb"></div>
+	</div>
+</body>
+</html>

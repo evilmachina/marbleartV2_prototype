@@ -1,0 +1,15 @@
+<html>
+<head>
+	<script type="text/javascript" src="/socket.io/socket.io.js"> </script>
+	<script>
+	function start(){
+		var socket = io.connect();
+		socket.on("message", function(msg){
+		   	console.log(msg);
+		})
+	}
+	</script>
+</head>
+<body onload = 'start()'>
+</body>
+</html>
