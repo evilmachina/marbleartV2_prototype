@@ -5,7 +5,7 @@ var http = require('http'),
 	sys = require('sys'),
 	sio = require('socket.io');
 
-var port = 5000;
+var port = 80;
 
 var server = http.createServer(function(req, res) {
        var uri = url.parse(req.url).pathname;
