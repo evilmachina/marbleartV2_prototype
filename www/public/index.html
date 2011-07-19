@@ -6,15 +6,21 @@
 		<script type="text/javascript" src="js/slider.js"></script>
 	<script>
 	function start(){
-		var socket = io.connect();
-		socket.on("message", function(msg){
-		   	console.log(msg);		
-		});
-		socket.emit("move","asdasds");
+	
+		
+		
 			$(document).ready(function(){
-				$('#rotatescroll').tinycircleslider({ callback: function(degrees){
+				var socket = io.connect();
+				
+			 	var circle = $('#rotatescroll').tinycircleslider({ callback: function(degrees){
 					    socket.emit("move","scroll");
 						console.log(degrees);} });
+				
+				socket.on("message", function(message){
+						console.log(message.pos);
+						$.fn.tinycircleslider.externalsetPossision(message.pos);		
+						});		
+				
 			});
 	}
 	</script>

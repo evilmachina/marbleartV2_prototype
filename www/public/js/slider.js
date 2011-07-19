@@ -3,7 +3,7 @@
 		var defaults = { 
 			radius: 140, // Used to determine the size of the circleslider
 			callback: null, // function that executes after every move
-			orginalAngle: 0
+			startAngle: 0
 		};
 		var options = $.extend(defaults, options);
 	
@@ -16,14 +16,30 @@
 		var oOverview = $('.overview', oCircle);
 	    var iOrginalAngle = options.orginalAngle;
 		var iDegrees = 0;
+	    
+		this.each(function(){
+		            function setPossision(degree){
+							console.log("set poss " + degree);
+							iDegrees = degree;
+							var angle = degree * (Math.PI/180);
+							oThumb.style.top = Math.round(-Math.cos(angle) * options.radius + (oCircleY /2 - oThumbY /2)) + 'px';
+							oThumb.style.left = Math.round(Math.sin(angle) * options.radius + (oCircleX /2 - oThumbX /2)) + 'px';
+					}
+		            $.fn.tinycircleslider.externalsetPossision = function(degree) {
+		                setPossision(degree);
+		            }
+		        });
+	
+		
 	
 	    return this.each(function(){
 			initialize();
+		
 		});
 			
 			function initialize(){
-					setCSS(iOrginalAngle)
-					setEvents();
+				//	setPossision(options.startAngle);
+				setEvents();
 			};
 			function setEvents(){
 				oThumb.onmousedown = start;
@@ -63,12 +79,13 @@
 				}
 				
 				iOrginalAngle = Math.atan2(oPos.x, -oPos.y);
-				setCSS(iOrginalAngle);
+				moved(iOrginalAngle);
+				
 				
 				return false;
 			};
 			
-			function setCSS(angle){
+			function moved(angle){
 				var newDegrees = Math.round( angle * 180 / Math.PI);
 				newDegrees = newDegrees < 0 ? newDegrees +360 : newDegrees;
 				
@@ -76,15 +93,15 @@
 				
 				if((moved >= 0 && moved < 10) || moved < -350)
 				{
-					//iDegrees = newDegrees;
-					iDegrees = iDegrees === 360 ? 0: iDegrees + 1;
+					angle = newDegrees * (Math.PI/180);
 					
-					oThumb.style.top = Math.round(-Math.cos(angle) * options.radius + (oCircleY /2 - oThumbY /2)) + 'px';
-					oThumb.style.left = Math.round(Math.sin(angle) * options.radius + (oCircleX /2 - oThumbX /2)) + 'px';
+					iDegrees = iDegrees === 360 ? 0: iDegrees + 1;
 					
 					if(typeof options.callback == 'function')options.callback.call(this, iDegrees);
 				}
 			};
+			
+			
 		  
 	};
 })(jQuery);

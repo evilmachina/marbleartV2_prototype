@@ -43,16 +43,16 @@ io.configure(function(){
  , 'jsonp-polling'
  ]);*/
 });
+var pos = 0;
 
 io.sockets.on("connection", function(socket){
-	io.sockets.json.send({"data": "jalla"});
+	io.sockets.json.send({"pos": pos});
+	
 	socket.on("move", function(mes){
-		console.log(mes);
-		io.sockets.json.send({"data": "move"});
+		pos = pos === 359 ? 0 : pos + 1;
+		console.log(pos);
+		io.sockets.json.send({"pos": pos});
 	});
 });
 
-io.sockets.on("move", function(mes){
-	console.log(mes);
-	io.sockets.json.send({"data": "move"});
-});
+
