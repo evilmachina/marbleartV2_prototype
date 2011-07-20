@@ -19,7 +19,6 @@
 	    
 		this.each(function(){
 		            function setPossision(degree){
-							console.log("set poss " + degree);
 							iDegrees = degree;
 							var angle = degree * (Math.PI/180);
 							oThumb.style.top = Math.round(-Math.cos(angle) * options.radius + (oCircleY /2 - oThumbY /2)) + 'px';
@@ -33,8 +32,7 @@
 		
 	
 	    return this.each(function(){
-			initialize();
-		
+			initialize();	
 		});
 			
 			function initialize(){
@@ -56,6 +54,7 @@
 						$(document).unbind('mousemove');
 						drag(oEvent);
 					};
+					
 					document.onmouseup = oThumb.onmouseup = end;
 					oThumb.ontouchend = document.ontouchend = function(oEvent){
 						document.onmouseup = oThumb.onmouseup = null;
@@ -91,7 +90,7 @@
 				
 				var moved = newDegrees - iDegrees; 
 				
-				if((moved >= 0 && moved < 10) || moved < -350)
+				if((moved >= 0 && moved < 30) || moved < -350)
 				{
 					angle = newDegrees * (Math.PI/180);
 					
