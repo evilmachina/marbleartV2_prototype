@@ -16,9 +16,9 @@
 					    socket.emit("move","scroll");
 						console.log(degrees);} });
 				
-				socket.on("message", function(message){
-						console.log(message.pos);
-						$.fn.tinycircleslider.externalsetPossision(message.pos);		
+				socket.on("newPos", function(newPos){
+						console.log(newPos);
+						$.fn.tinycircleslider.externalsetPossision(newPos.pos);		
 						});		
 				
 			});

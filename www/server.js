@@ -5,7 +5,7 @@ var http = require('http'),
 	sys = require('sys'),
 	sio = require('socket.io');
 
-var port = 80;
+var port = 5000;
 
 var server = http.createServer(function(req, res) {
        var uri = url.parse(req.url).pathname;
@@ -43,16 +43,20 @@ io.configure(function(){
  , 'jsonp-polling'
  ]);*/
 });
-var pos = 0;
+var curentPossision = 0;
 
 io.sockets.on("connection", function(socket){
-	io.sockets.json.send({"pos": pos});
-	
+//	io.sockets.json.send({"pos": pos});
+	socket.emit("newPos", {pos: curentPosssision});
 	socket.on("move", function(mes){
-		pos = pos === 359 ? 0 : pos + 1;
-		console.log(pos);
-		io.sockets.json.send({"pos": pos});
+		curentPossision = curentPossision === 359 ? 0 : curentPossision + 1;
+		
+		socket.emit("newPos", {pos: curentPossision});
 	});
 });
 
+process.on('uncaughtException', function(err){
+	console.log('Something bad happend: ' + err);
+	process.exit(0);
+});
 
