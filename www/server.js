@@ -46,11 +46,11 @@ io.configure(function(){
 var curentPossision = 0;
 
 io.sockets.on("connection", function(socket){
-//	io.sockets.json.send({"pos": pos});
+   
 	socket.emit("newPos", {pos: curentPossision});
 	socket.on("move", function(mes){
 		curentPossision = curentPossision === 359 ? 0 : curentPossision + 1;	
-		socket.emit("newPos", {pos: curentPossision});
+		io.sockets.emit("newPos", {pos: curentPossision});
 	});
 });
 
