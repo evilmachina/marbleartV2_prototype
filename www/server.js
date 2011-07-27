@@ -5,7 +5,7 @@ var http = require('http'),
 	sys = require('sys'),
 	sio = require('socket.io');
 
-var port = 80;
+var port = 1337;
 
 var server = http.createServer(function(req, res) {
        var uri = url.parse(req.url).pathname;
@@ -35,6 +35,7 @@ var server = http.createServer(function(req, res) {
 server.listen(port);
 
 
+var io = sio.listen(server);
 io.configure(function(){
 /*
  io.set('transports', [
@@ -45,7 +46,6 @@ io.configure(function(){
 });
 var curentPossision = 0;
 
-var io = sio.listen(server);
 io.sockets.on("connection", function(socket){
    
 	socket.emit("newPos", {pos: curentPossision});

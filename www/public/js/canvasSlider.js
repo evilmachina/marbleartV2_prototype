@@ -7,8 +7,8 @@ function circle() {
 
 var canvas;
 var ctx;
-var WIDTH;
-var HEIGHT;
+var canvasWidth;
+var canvasHeight;
 var INTERVAL = 20;  
 var isDrag = false;
 var mx, my; 
@@ -32,20 +32,50 @@ var stylePaddingLeft, stylePaddingTop, styleBorderLeft, styleBorderTop;
 
 var knob, track;
 var background;
+var canvasWidth =0; 
+var canvasHeight = 0;
+
+
+function resize(){
+	
+	var viewportWidth = window.innerWidth;
+    var viewportHeight = window.innerHeight;
+	
+	var C = 1;        
+	var W_TO_H = 1;//2/1;  
+	if(viewportWidth < viewportHeight){
+		canvasWidth = viewportWidth * C;
+		canvasHeight = canvasWidth / W_TO_H;
+    }
+	else{
+			canvasHeight = viewportHeight * C;
+			canvasWidth = canvasHeight / W_TO_H;
+	}
+
+    canvas.style.position = "fixed";
+    canvas.setAttribute("width", canvasWidth);
+    canvas.setAttribute("height", canvasHeight);
+    canvas.style.top = (viewportHeight - canvasHeight) / 2;
+    canvas.style.left = (viewportWidth - canvasWidth) / 2;
+   	canvasHeight = canvas.height;
+	canvasWidth = canvas.width;
+    invalidate();
+}
 
 function init() {
   canvas = document.getElementById('canvas');
-  HEIGHT = canvas.height;
-  WIDTH = canvas.width;
+  resize();
+  canvasHeight = canvas.height;
+  canvasWidth = canvas.width;
   ctx = canvas.getContext('2d');
   ghostcanvas = document.createElement('canvas');
-  ghostcanvas.height = HEIGHT;
-  ghostcanvas.width = WIDTH;
+  ghostcanvas.height = canvasHeight;
+  ghostcanvas.width = canvasWidth;
   gctx = ghostcanvas.getContext('2d');
   
   //fixes a problem where double clicking causes text to get selected on the canvas
   canvas.onselectstart = function () { return false; }
-  
+   window.onresize = function () { resize(); }
   // fixes mouse co-ordinate problems when there's a border or padding
   // see getMouse for more detail
   if (document.defaultView && document.defaultView.getComputedStyle) {
@@ -69,33 +99,32 @@ function init() {
   knob.x = 20;
   knob.y = 20;
   knob.r = 10;
-
-  track = new circle;
-  track.x = WIDTH/2;
-  track.y = HEIGHT/2;
-  track.r = WIDTH*0.8/2;
-
 }
 
 function clear(canvas) {
-  canvas.clearRect(0, 0, WIDTH, HEIGHT);
+  canvas.clearRect(0, 0, canvasWidth, canvasHeight);
+}
+
+function drawTrack(context){
+	var y = canvas.height/2,
+		x = canvas.width/2,
+		r = (canvas.width > canvas.height) ? (canvas.height*0.4) : (canvas.width*0.4) ;
+    context.strokeStyle = "gray";
+    context.lineWidth = 4;
+    context.beginPath();
+    context.arc(x, y, r, 0, Math.PI*2, true);
+    context.stroke();	
 }
 
 function draw() {
   if (canvasValid == false) {
     clear(ctx);
     var context = ctx;
-    context.strokeStyle = "gray";
-    context.lineWidth = 4;
-    context.beginPath();
-    context.arc(track.x,track.y, track.r, 0, Math.PI*2, true);
-    context.stroke();
-
-
+    drawTrack(context);
 
     context.fillStyle = knob.fill;
     context.beginPath();
-    context.arc(knob.x,knob.y, knob.r, 0, Math.PI*2, true);
+    context.arc(knob.x, knob.y, knob.r, 0, Math.PI*2, true);
     context.fill();
     
 

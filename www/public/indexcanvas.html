@@ -2,20 +2,36 @@
 xmlns:v="urn:schemas-microsoft-com:vml">
 <head>
     <meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	
     <title>kulbana canvas</title>
+
    <style type="text/css">
-      #container { position: relative; }
-      #canvas { border: 1px solid #000; }
+	body { margin: 0px; }
+	#container { width: 95%;
+        height: 95%;
+        }
+    #canvas { border: 1px solid #000;	
+		}
     </style>
 	<script type="text/javascript" src="js/canvasSlider.js"></script>
+	<script type="application/x-javascript">
+	 /*  addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false);
+
+	   function hideURLbar(){
+	   window.scrollTo(0,1);
+	   }*/
+	</script>
  </head>
   <body onLoad="init()">
     
-    <div id="container">
-    <canvas id="canvas" width="320" height="480">
+    <!--<div id="container"> -->
+    <canvas id="canvas" >
     This text is displayed if your browser does not support HTML5 Canvas.
     </canvas>
-    </div>
+   <!-- </div> -->
     
   </body>
 </html>
