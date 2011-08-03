@@ -3,9 +3,13 @@ var http = require('http'),
 	fs = require('fs'),
 	path = require('path'),
 	sys = require('sys'),
-	sio = require('socket.io');
+	sio = require('socket.io'),
+	net = require('net');
 
-var port = 1337;
+var port = 1337,
+    tcpPort = 1338;
+
+
 
 var server = http.createServer(function(req, res) {
        var uri = url.parse(req.url).pathname;
@@ -32,8 +36,20 @@ var server = http.createServer(function(req, res) {
        });
 });
 
+var tcpSockets = [];
 server.listen(port);
 
+var tcpServer = net.createServer(function (tcpSocket) {
+  	tcpSockets.push(tcpSocket);
+    tcpSocket.on('data', function(data){
+	for (var i = 0; i < tcpSockets.length; i++){
+	 tcpSockets[i].write(data);	
+	}
+	
+  });
+});
+
+tcpServer.listen(tcpPort);
 
 var io = sio.listen(server);
 io.configure(function(){
@@ -52,8 +68,21 @@ io.sockets.on("connection", function(socket){
 	socket.on("move", function(mes){
 		curentPossision = curentPossision === 359 ? 0 : curentPossision + 1;	
 		io.sockets.emit("newPos", {pos: curentPossision});
+		sendToTcp(curentPossision);
+		
 	});
 });
+
+function sendToTcp(data){
+	for (var i = 0; i < tcpSockets.length; i++){
+		try {
+				tcpSockets[i].write(data.toString() + '\n');	
+			}
+		catch (err) {
+			  	console.log('socket error: ' + err);
+			}
+	}
+};
 
 process.on('uncaughtException', function(err){
 	console.log('Something bad happend: ' + err);

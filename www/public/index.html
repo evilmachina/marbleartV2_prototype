@@ -1,25 +1,10 @@
 <html>
 <head>
-	<meta name="viewport" content="width=device-width, user-scalable=no">
-	<meta name="apple-mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-	
-	<!-- <link rel="stylesheet" href="css/style.css" type="text/css"/> -->
-	<style type="text/css">
-	body { margin: 0px; overflow: hidden; }
-	canvas { border: 1px solid black; }
-	</style>
-	
+	<link rel="stylesheet" href="css/style.css" type="text/css"/>
 	<script type="text/javascript" src="/socket.io/socket.io.js"> </script>
 	<script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
 	<script type="text/javascript" src="js/slider.js"></script>
 	<script>
-	
-	var canvas;
-	var ctx;
-	var w = 0;
-	var h = 0;
-	
 	function start(){
 				
 		$(document).ready(function(){
@@ -33,8 +18,6 @@
 					//console.log(newPos);
 					$.fn.tinycircleslider.externalsetPossision(newPos.pos);
 			});
-			
-			ctx = canvas.getContext('2d');
 			
 		});
 	}

@@ -75,7 +75,7 @@ function init() {
   
   //fixes a problem where double clicking causes text to get selected on the canvas
   canvas.onselectstart = function () { return false; }
-   window.onresize = function () { resize(); }
+   window.onresize = resize; 
   // fixes mouse co-ordinate problems when there's a border or padding
   // see getMouse for more detail
   if (document.defaultView && document.defaultView.getComputedStyle) {
@@ -88,8 +88,8 @@ function init() {
 
   // set our events. Up and down are for dragging,
   // double click is for making new boxes
- // canvas.onmousedown = myDown;
- // canvas.onmouseup = myUp;
+   canvas.onmousedown = myDown;
+   canvas.onmouseup = myUp;
  // canvas.ondblclick = myDblClick;
 
   // add custom initialization here:
@@ -142,4 +142,67 @@ function draw() {
 
 function invalidate() {
   canvasValid = false;
+}
+
+function myDown(e){
+  getMouse(e);
+  clear(gctx);
+  
+  // drawshape(gctx, knob, 'black');
+    
+    // get image data at the mouse x,y pixel
+    var imageData = ctx.getImageData(mx, my, 1, 1);
+    var index = (mx + my * imageData.width) * 4;
+    console.log("hej");
+    // if the mouse pixel exists, select and break
+    if (imageData.data[3] > 0) {
+      mySel = knob;
+      offsetx = mx - mySel.x;
+      offsety = my - mySel.y;
+      mySel.x = mx - offsetx;
+      mySel.y = my - offsety;
+      isDrag = true;
+      canvas.onmousemove = myMove;
+      invalidate();
+      clear(gctx);
+      
+      return;
+    }
+    
+  // havent returned means we have selected nothing
+  mySel = null;
+  // clear the ghost canvas for next time
+  clear(gctx);
+  // invalidate because we might need the selection border to disappear
+  invalidate();
+}
+
+function myUp(){
+  isDrag = false;
+  canvas.onmousemove = null;
+  invalidate();
+ mySel = null;
+ //clear(gctx);
+
+}
+
+function getMouse(e) {
+      var element = canvas, offsetX = 0, offsetY = 0;
+
+      if (element.offsetParent) {
+        do {
+          offsetX += element.offsetLeft;
+          offsetY += element.offsetTop;
+        } while ((element = element.offsetParent));
+      }
+
+      // Add padding and border style widths to offset
+      offsetX += stylePaddingLeft;
+      offsetY += stylePaddingTop;
+
+      offsetX += styleBorderLeft;
+      offsetY += styleBorderTop;
+
+      mx = e.pageX - offsetX;
+      my = e.pageY - offsetY
 }
