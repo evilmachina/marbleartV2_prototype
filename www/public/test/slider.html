@@ -1,0 +1,136 @@
+<html>
+<head>
+    <title>Custom Slider</title>
+    <!-- Fill the iOS screen /-->
+    <meta name="viewport" content="width=400" />
+ 
+<style> 
+.slider {
+    position: absolute;
+    top: 115;
+    left:85;
+    width: 152;
+    height = 52;
+	border: 4 px solid #404040;
+	width:152 px;
+    height: 152 px;
+    border-radius: 76 px;
+}
+ 
+.bar {
+    position: relative;
+    top:30;
+    width: 152;
+    #height: 2 px;
+    #background-color: #404040;
+}
+ 
+.knob {
+    position: relative;
+    left:0;
+    border: 1 px solid #404040;
+    background-color: #C0C0C0;
+    width:50 px;
+    height: 50 px;
+    border-radius: 25 px;
+}
+ 
+</style>
+ 
+<script type="text/javascript">
+ 
+var can;
+var ctx;
+var image;
+var slider;
+var knob;
+var mouseIsDown;
+var knobMid;
+ 
+function init() {
+    slider = document.getElementById("slider");
+    knob = document.getElementById("knob");
+    image = document.getElementById("image");
+   // can = document.getElementById("can");
+   // ctx = can.getContext("2d");
+    mouseIsDown = 0;
+    knobMid = knob.offsetWidth / 2;
+  //  margin = can.offsetLeft - 1;
+    
+}
+ 
+function mouseDown() {
+    mouseIsDown = 1;
+    mouseXY();
+}
+ 
+function mouseUp() {
+    mouseIsDown = 0;
+}
+ 
+function mouseXY(e) {
+    if (mouseIsDown) {
+        if (!e) var e = event;
+		e.preventDefault();
+        var mouseX = e.pageX - slider.offsetLeft;
+       /* if (mouseX >= 0 && mouseX <= slider.offsetWidth ) {
+            setKnob(mouseX);
+        }*/
+		if(moved(mouseX, mouseY))
+		{
+			
+		}
+    }
+}
+
+function moved(e){
+	var x = e.pag
+} 
+
+function touchXY(e) {
+    if (!e) var e = event;
+    // slide, don't scroll
+    e.preventDefault();
+    var touchX = e.touches[0].pageX - slider.offsetLeft;
+    if (touchX >= 0 && touchX <= slider.offsetWidth) {
+        setKnob(touchX);
+    }
+}
+ 
+
+function setPossision(degree){
+		iDegrees = degree;
+		var angle = degree * (Math.PI/180);
+		oThumb.style.top = Math.round(-Math.cos(angle) * options.radius + (oCircleY /2 - oThumbY /2)) + 'px';
+		oThumb.style.left = Math.round(Math.sin(angle) * options.radius + (oCircleX /2 - oThumbX /2)) + 'px';
+}
+
+function setKnob(x) {
+    var knobX = x - knobMid;
+    knobX = Math.max(knobX, 0);
+    knobX = Math.min(knobX, slider.offsetWidth - knob.offsetWidth);
+    knob.style.left = knobX;
+}
+ 
+</script>
+</head>
+ 
+<body onload="init()" onmouseup="mouseUp()" >
+ 
+<!--<canvas id="can" height="200" width="300">
+</canvas>
+ -->
+<div class="slider" id="slider"
+    >
+    <div class="bar">
+    </div>
+    <div id="knob" class="knob"
+		onmousedown="mouseDown()" onmousemove="mouseXY()"
+	    ontouchstart="touchXY()" ontouchmove="touchXY()">
+	
+    </div>
+<div>
+<!--<img id="image" style="display:none"
+     src="http://homepage.mac.com/qt4web/butterfly/butterfly1.png" > -->
+</body>
+</html>
