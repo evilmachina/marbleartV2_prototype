@@ -1,0 +1,176 @@
+<html>
+<head>
+    <title>Custom Slider</title>
+    <!-- Fill the iOS screen /-->
+    <meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+ 
+<style> 
+.slider {
+    position: absolute;
+    top: 115;
+    left:85;
+	border: 4 px solid #404040;
+	width:152 px;
+    height: 152 px;
+    border-radius: 50%;
+}
+ 
+.knob {
+    position: relative;
+    left:0;
+    border: 1 px solid #404040;
+    background-color: #C0C0C0;
+    width:50 px;
+    height: 50 px;
+    border-radius: 25 px;
+}
+ 
+</style>
+ 	
+<script type="text/javascript" src="/socket.io/socket.io.js"> </script>
+<script type="text/javascript">
+ 
+var slider;
+var knob;
+var mouseIsDown;
+var knobMid;
+var socket;
+var iDegrees = 0;
+var oThumbY = 50;
+var oThumbX = 50;
+var sliderWidth;
+var sliderHeight;
+
+
+
+function init() {
+    slider = document.getElementById("slider");
+    knob = document.getElementById("knob");
+    image = document.getElementById("image");
+    resize();
+	window.onresize = resize;
+    mouseIsDown = 0;
+    knobMid = knob.offsetWidth / 2;
+    startSocket();
+}
+
+function resize(){
+	
+	var viewportWidth = window.innerWidth;
+    var viewportHeight = window.innerHeight;
+	var C = 0.75;        
+	var W_TO_H = 1;
+	if(viewportWidth < viewportHeight){
+		sliderWidth = viewportWidth * C;
+		sliderHeight = sliderWidth / W_TO_H;
+    }
+	else{
+		sliderHeight = viewportHeight * C;
+		sliderWidth = sliderHeight / W_TO_H;
+	}
+	
+    slider.style.position = "fixed";
+    slider.style.width = sliderWidth;
+    slider.style.height = sliderHeight;
+    slider.style.top = (viewportHeight - sliderHeight) / 2;
+    slider.style.left = (viewportWidth - sliderWidth) / 2;
+    slider.style.borderRadius= (sliderHeight) + ' px';
+	setPossision(iDegrees);
+}
+
+function startSocket(){
+			
+		socket = io.connect();
+		socket.on("newPos", function(newPos){
+		//	console.log(newPos.pos);
+			setPossision(newPos.pos);
+		});
+}
+
+function sendMoved(){
+	socket.emit("move","scroll");
+}
+ 
+function mouseDown() {
+    mouseIsDown = 1;
+    mouseXY();
+}
+ 
+function mouseUp() {
+    mouseIsDown = 0;
+}
+ 
+function mouseXY(e) {
+    if (mouseIsDown) {
+        if (!e) var e = event;
+		e.preventDefault();
+		
+    	var oPos = {
+			x: e.pageX - slider.offsetLeft - (sliderWidth / 2),
+			y: e.pageY - slider.offsetTop - (sliderHeight / 2)
+		}
+		var angle = Math.atan2(oPos.x, -oPos.y);
+		moved(angle);
+    }
+}
+
+function touchXY(e) {
+    if (!e) var e = event;
+    e.preventDefault();
+    
+	var oPos = {
+		x: e.touches[0].pageX - slider.offsetLeft - (sliderWidth / 2),
+		y: e.touches[0].pageY - slider.offsetTop - (sliderHeight / 2)
+	}
+	var angle = Math.atan2(oPos.x, -oPos.y);
+	moved(angle);
+    
+}
+
+function moved(angle){
+	var newDegrees = Math.round( angle * 180 / Math.PI);
+	newDegrees = newDegrees < 0 ? newDegrees +360 : newDegrees;
+	
+	var moved = newDegrees - iDegrees; 
+	if((moved >= 0 && moved < 30) || moved < -350)
+	{
+		angle = newDegrees * (Math.PI/180);		
+		iDegrees = iDegrees === 360 ? 0: iDegrees + 1;	
+		sendMoved();
+	}
+}
+
+function setPossision(degree){
+		iDegrees = degree;
+		var angle = degree * (Math.PI/180);	
+		knob.style.top = Math.round(-Math.cos(angle) * (slider.offsetWidth / 2 ) + (sliderHeight /2 - oThumbY /2));
+		knob.style.left = Math.round(Math.sin(angle) * (slider.offsetWidth / 2 ) + (sliderWidth /2 - oThumbX /2));
+}
+
+function setKnob(x) {
+    var knobX = x - knobMid;
+    knobX = Math.max(knobX, 0);
+    knobX = Math.min(knobX, slider.offsetWidth - knob.offsetWidth);
+    knob.style.left = knobX;
+}
+ 
+function disableScrol(e) {
+    if (!e) var e = event;
+
+    e.preventDefault();
+}
+</script>
+</head>
+ 
+<body onload="init()" onmouseup="mouseUp()" ontouchmove="disableScrol()">
+<div class="slider" id="slider">
+    <div id="knob" class="knob"
+		onmousedown="mouseDown()" onmousemove="mouseXY()"
+	    ontouchstart="touchXY()" ontouchmove="touchXY()">
+    </div>
+<div>
+</body>
+</html>
