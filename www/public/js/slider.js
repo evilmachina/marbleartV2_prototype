@@ -16,7 +16,7 @@
 		var oOverview = $('.overview', oCircle);
 	    var iOrginalAngle = options.orginalAngle;
 		var iDegrees = 0;
-	    
+	    var mouseIsDown;
 		this.each(function(){
 		            function setPossision(degree){
 							iDegrees = degree;
@@ -37,7 +37,8 @@
 			
 			function initialize(){
 				//	setPossision(options.startAngle);
-				setEvents();
+				//setEvents();
+				 mouseIsDown = 0;
 			};
 			function setEvents(){
 				oThumb.onmousedown = start;
@@ -48,8 +49,8 @@
 					return false;
 				}
 			};	
-			function start(oEvent){
-					$(document).mousemove(drag);
+			function mouseDown(oEvent){
+				/*	$(document).mousemove(drag);
 					document.ontouchmove = function(oEvent){
 						$(document).unbind('mousemove');
 						drag(oEvent);
@@ -60,14 +61,18 @@
 						document.onmouseup = oThumb.onmouseup = null;
 						end(oEvent);
 					}
-					return false;
+					return false;*/
+					mouseIsDown = 1;
+				    mouseXY();
 			};
 			function end(oEvent){
 				$(document).unbind('mousemove');
 				document.ontouchmove = document.ontouchend = document.onmouseup = oThumb.onmouseup = oThumb.ontouchend = null;
 				return false;
 			};
-			function drag(oEvent){
+			function mouseXY(oEvent){
+				if(mouseIsDown === 0) return;
+				
 				oEvent.preventDefault();
 				if(typeof(oEvent.touches) != 'undefined' && oEvent.touches.length == 1){ 
 				    var oEvent = oEvent.touches[0]; 

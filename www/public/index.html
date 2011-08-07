@@ -22,7 +22,6 @@
 		});
 	}
 	</script>
-
 </head>
 <body onload = 'start()'>
 	<div id="rotatescroll">
@@ -32,7 +31,10 @@
 			</ul>
 		</div>
 		<div class="overlay"></div>
-		<div class="thumb"></div>
+		<div class="thumb"
+			onmousedown="mouseDown()" onmousemove="mouseXY()"
+		    ontouchstart="touchXY()" ontouchmove="touchXY()">	
+		</div>
 	</div>
 </body>
 </html>

@@ -2,27 +2,20 @@
 <head>
     <title>Custom Slider</title>
     <!-- Fill the iOS screen /-->
-    <meta name="viewport" content="width=400" />
+    <meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
  
 <style> 
 .slider {
     position: absolute;
     top: 115;
     left:85;
-    width: 152;
-    height = 52;
 	border: 4 px solid #404040;
 	width:152 px;
     height: 152 px;
-    border-radius: 76 px;
-}
- 
-.bar {
-    position: relative;
-    top:30;
-    width: 152;
-    #height: 2 px;
-    #background-color: #404040;
+    border-radius: 50%;
 }
  
 .knob {
@@ -36,27 +29,69 @@
 }
  
 </style>
- 
+ 	
+<script type="text/javascript" src="/socket.io/socket.io.js"> </script>
 <script type="text/javascript">
  
-var can;
-var ctx;
-var image;
 var slider;
 var knob;
 var mouseIsDown;
 var knobMid;
- 
+var socket;
+var iDegrees = 0;
+var oThumbY = 50;
+var oThumbX = 50;
+var sliderWidth;
+var sliderHeight;
+
+
+
 function init() {
     slider = document.getElementById("slider");
     knob = document.getElementById("knob");
     image = document.getElementById("image");
-   // can = document.getElementById("can");
-   // ctx = can.getContext("2d");
+    resize();
+	window.onresize = resize;
     mouseIsDown = 0;
     knobMid = knob.offsetWidth / 2;
-  //  margin = can.offsetLeft - 1;
-    
+    startSocket();
+}
+
+function resize(){
+	
+	var viewportWidth = window.innerWidth;
+    var viewportHeight = window.innerHeight;
+	var C = 0.75;        
+	var W_TO_H = 1;
+	if(viewportWidth < viewportHeight){
+		sliderWidth = viewportWidth * C;
+		sliderHeight = sliderWidth / W_TO_H;
+    }
+	else{
+		sliderHeight = viewportHeight * C;
+		sliderWidth = sliderHeight / W_TO_H;
+	}
+	
+    slider.style.position = "fixed";
+    slider.style.width = sliderWidth;
+    slider.style.height = sliderHeight;
+    slider.style.top = (viewportHeight - sliderHeight) / 2;
+    slider.style.left = (viewportWidth - sliderWidth) / 2;
+    slider.style.borderRadius= (sliderHeight) + ' px';
+	setPossision(iDegrees);
+}
+
+function startSocket(){
+			
+		socket = io.connect();
+		socket.on("newPos", function(newPos){
+		//	console.log(newPos.pos);
+			setPossision(newPos.pos);
+		});
+}
+
+function sendMoved(){
+	socket.emit("move","scroll");
 }
  
 function mouseDown() {
@@ -72,37 +107,47 @@ function mouseXY(e) {
     if (mouseIsDown) {
         if (!e) var e = event;
 		e.preventDefault();
-        var mouseX = e.pageX - slider.offsetLeft;
-       /* if (mouseX >= 0 && mouseX <= slider.offsetWidth ) {
-            setKnob(mouseX);
-        }*/
-		if(moved(mouseX, mouseY))
-		{
-			
+		
+    	var oPos = {
+			x: e.pageX - slider.offsetLeft - (sliderWidth / 2),
+			y: e.pageY - slider.offsetTop - (sliderHeight / 2)
 		}
+		var angle = Math.atan2(oPos.x, -oPos.y);
+		moved(angle);
     }
 }
-
-function moved(e){
-	var x = e.pag
-} 
 
 function touchXY(e) {
     if (!e) var e = event;
-    // slide, don't scroll
     e.preventDefault();
-    var touchX = e.touches[0].pageX - slider.offsetLeft;
-    if (touchX >= 0 && touchX <= slider.offsetWidth) {
-        setKnob(touchX);
-    }
+    
+	var oPos = {
+		x: e.touches[0].pageX - slider.offsetLeft - (sliderWidth / 2),
+		y: e.touches[0].pageY - slider.offsetTop - (sliderHeight / 2)
+	}
+	var angle = Math.atan2(oPos.x, -oPos.y);
+	moved(angle);
+    
 }
- 
+
+function moved(angle){
+	var newDegrees = Math.round( angle * 180 / Math.PI);
+	newDegrees = newDegrees < 0 ? newDegrees +360 : newDegrees;
+	
+	var moved = newDegrees - iDegrees; 
+	if((moved >= 0 && moved < 30) || moved < -350)
+	{
+		angle = newDegrees * (Math.PI/180);		
+		iDegrees = iDegrees === 360 ? 0: iDegrees + 1;	
+		sendMoved();
+	}
+}
 
 function setPossision(degree){
 		iDegrees = degree;
-		var angle = degree * (Math.PI/180);
-		oThumb.style.top = Math.round(-Math.cos(angle) * options.radius + (oCircleY /2 - oThumbY /2)) + 'px';
-		oThumb.style.left = Math.round(Math.sin(angle) * options.radius + (oCircleX /2 - oThumbX /2)) + 'px';
+		var angle = degree * (Math.PI/180);	
+		knob.style.top = Math.round(-Math.cos(angle) * (slider.offsetWidth / 2 ) + (sliderHeight /2 - oThumbY /2));
+		knob.style.left = Math.round(Math.sin(angle) * (slider.offsetWidth / 2 ) + (sliderWidth /2 - oThumbX /2));
 }
 
 function setKnob(x) {
@@ -112,25 +157,20 @@ function setKnob(x) {
     knob.style.left = knobX;
 }
  
+function disableScrol(e) {
+    if (!e) var e = event;
+
+    e.preventDefault();
+}
 </script>
 </head>
  
-<body onload="init()" onmouseup="mouseUp()" >
- 
-<!--<canvas id="can" height="200" width="300">
-</canvas>
- -->
-<div class="slider" id="slider"
-    >
-    <div class="bar">
-    </div>
+<body onload="init()" onmouseup="mouseUp()" ontouchmove="disableScrol()">
+<div class="slider" id="slider">
     <div id="knob" class="knob"
 		onmousedown="mouseDown()" onmousemove="mouseXY()"
 	    ontouchstart="touchXY()" ontouchmove="touchXY()">
-	
     </div>
 <div>
-<!--<img id="image" style="display:none"
-     src="http://homepage.mac.com/qt4web/butterfly/butterfly1.png" > -->
 </body>
 </html>

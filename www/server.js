@@ -6,10 +6,14 @@ var http = require('http'),
 	sio = require('socket.io'),
 	net = require('net');
 
-var port = 1337,
-    tcpPort = 1338;
+var port = 80,
+    tcpPort = 51337;
 
-
+Array.prototype.remove = function(e) {
+	  for (var i = 0; i < this.length; i++) {
+	    if (e == this[i]) { return this.splice(i, 1); }
+	  }
+	};
 
 var server = http.createServer(function(req, res) {
        var uri = url.parse(req.url).pathname;
@@ -63,7 +67,6 @@ io.configure(function(){
 var curentPossision = 0;
 
 io.sockets.on("connection", function(socket){
-   
 	socket.emit("newPos", {pos: curentPossision});
 	socket.on("move", function(mes){
 		curentPossision = curentPossision === 359 ? 0 : curentPossision + 1;	
@@ -74,14 +77,21 @@ io.sockets.on("connection", function(socket){
 });
 
 function sendToTcp(data){
-	for (var i = 0; i < tcpSockets.length; i++){
+	var length = tcpSockets.length - 1;
+	for (var i = length; i >= 0; i--){
 		try {
 				tcpSockets[i].write(data.toString() + '\n');	
 			}
 		catch (err) {
+				testTcpSocket(tcpSockets[i]);
 			  	console.log('socket error: ' + err);
 			}
 	}
+};
+
+function testTcpSocket(socket)
+{
+	tcpSockets.remove(socket);	
 };
 
 process.on('uncaughtException', function(err){
