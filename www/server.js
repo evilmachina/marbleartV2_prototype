@@ -64,12 +64,13 @@ io.configure(function(){
  , 'jsonp-polling'
  ]);*/
 });
-var curentPossision = 0;
+var curentPossision = 0,
+	stepAngle = 1.8;
 
 io.sockets.on("connection", function(socket){
 	socket.emit("newPos", {pos: curentPossision});
 	socket.on("move", function(mes){
-		curentPossision = curentPossision === 359 ? 0 : curentPossision + 1;	
+		curentPossision = curentPossision > 359.9 ? 0 : curentPossision + stepAngle;	
 		io.sockets.emit("newPos", {pos: curentPossision});
 		sendToTcp(curentPossision);
 		
